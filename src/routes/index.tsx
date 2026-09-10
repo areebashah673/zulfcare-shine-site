@@ -1,9 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Leaf, Sparkles, Droplets, ShieldCheck, HeartHandshake } from "lucide-react";
-import z1Asset from "@/assets/z1.webp.asset.json";
-import z2Asset from "@/assets/z2.webp.asset.json";
-import braidAsset from "@/assets/zulfcare.webp.asset.json";
-import bottleAsset from "@/assets/bottle.webp.asset.json";
+import { Link } from "@tanstack/react-router";
+import { Leaf, Sparkles, Droplets, ShieldCheck, HeartHandshake, ShoppingBag } from "lucide-react";
+
+const z1Asset = { url: "/images/z1.webp" };
+const z2Asset = { url: "/images/z2.webp" };
+const braidAsset = { url: "/images/zulfcare.webp" };
+const bottleAsset = { url: "/images/bottle.webp" };
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -81,12 +83,13 @@ function Index() {
             <a href="#benefits" className="transition-colors hover:text-primary">Benefits</a>
             <a href="#ritual" className="transition-colors hover:text-primary">The Ritual</a>
             <a href="#ingredients" className="transition-colors hover:text-primary">Ingredients</a>
-            <a
-              href="#shop"
-              className="rounded-full bg-primary px-5 py-2 text-primary-foreground transition-colors hover:bg-primary/90"
+            <Link
+              to="/cart"
+              className="flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-primary-foreground transition-colors hover:bg-primary/90"
             >
-              Get Yours
-            </a>
+              <ShoppingBag className="h-4 w-4" strokeWidth={1.5} />
+              Cart
+            </Link>
           </nav>
         </div>
       </header>
@@ -240,12 +243,12 @@ function Index() {
               <HeartHandshake className="h-5 w-5 text-primary" strokeWidth={1.5} />
               Made with love, in small batches
             </div>
-            <a
-              href="#top"
+            <Link
+              to="/cart"
               className="mt-10 inline-block rounded-full bg-primary px-8 py-3.5 text-sm font-medium tracking-wide text-primary-foreground transition-transform hover:-translate-y-0.5"
             >
-              Order Now
-            </a>
+              Add to Cart
+            </Link>
           </div>
           <div className="order-1 overflow-hidden rounded-3xl shadow-xl md:order-2">
             <img
