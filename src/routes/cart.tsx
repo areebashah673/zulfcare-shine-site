@@ -120,6 +120,93 @@ function CartPage() {
     setTimeout(() => setCopiedField(null), 1500);
   };
 
+  const handleCheckout = () => {
+    const result = detailsSchema.safeParse(details);
+    if (!result.success) {
+      const next: Partial<Record<keyof Details, string>> = {};
+      for (const issue of result.error.issues) {
+        const key = issue.path[0] as keyof Details;
+        if (!next[key]) next[key] = issue.message;
+      }
+      setErrors(next);
+      document
+        .getElementById("delivery-details")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+    setErrors({});
+    setPlaced(true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  if (placed) {
+    return (
+      <div className="flex min-h-screen flex-col bg-background text-foreground">
+        <header className="border-b border-border/60 bg-background/80 backdrop-blur-md">
+          <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+            <Link to="/" className="font-serif text-2xl font-semibold tracking-wide text-primary">
+              Zulf <span className="italic">Care</span>
+            </Link>
+          </div>
+        </header>
+
+        <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col items-center px-6 py-24 text-center">
+          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-leaf text-gold">
+            <CheckCircle2 className="h-10 w-10" strokeWidth={1.5} />
+          </div>
+          <h1 className="mt-8 font-serif text-4xl font-semibold text-primary md:text-5xl">
+            Your order has been <span className="italic">placed</span>
+          </h1>
+          <p className="mt-5 text-lg text-muted-foreground">
+            Thank you, {details.name.split(" ")[0]}. Our agent will contact you shortly on your
+            WhatsApp number to confirm the delivery.
+          </p>
+
+          <div className="mt-10 w-full rounded-3xl border border-border bg-card p-8 text-left">
+            <dl className="space-y-4 text-sm">
+              <div className="flex items-center justify-between gap-4">
+                <dt className="text-muted-foreground">WhatsApp</dt>
+                <dd className="flex items-center gap-2 font-medium">
+                  <MessageCircle className="h-4 w-4 text-primary" strokeWidth={1.5} />
+                  {details.whatsapp}
+                </dd>
+              </div>
+              <div className="flex items-center justify-between gap-4">
+                <dt className="text-muted-foreground">Payment</dt>
+                <dd className="font-medium">
+                  {paymentMethod === "bank" ? "Bank Transfer (10% off)" : "Cash on Delivery"}
+                </dd>
+              </div>
+              <div className="flex items-center justify-between gap-4">
+                <dt className="text-muted-foreground">Delivering to</dt>
+                <dd className="max-w-[60%] text-right font-medium">
+                  {details.address}, {details.zip}
+                </dd>
+              </div>
+              <div className="flex items-center justify-between gap-4 border-t border-border pt-4">
+                <dt className="text-muted-foreground">Total</dt>
+                <dd className="font-serif text-2xl text-primary">{rupees(total)}</dd>
+              </div>
+            </dl>
+            {paymentMethod === "bank" && (
+              <p className="mt-6 rounded-2xl bg-muted p-4 text-xs text-muted-foreground">
+                Please share your transfer receipt with our agent on WhatsApp so we can dispatch
+                your order.
+              </p>
+            )}
+          </div>
+
+          <Link
+            to="/"
+            className="mt-10 inline-block rounded-full bg-primary px-8 py-3.5 text-sm font-medium tracking-wide text-primary-foreground transition-transform hover:-translate-y-0.5"
+          >
+            Back to home
+          </Link>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="border-b border-border/60 bg-background/80 backdrop-blur-md">
