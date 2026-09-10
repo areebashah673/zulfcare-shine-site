@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { z } from "zod";
 import {
   Minus,
   Plus,
@@ -11,6 +12,8 @@ import {
   Landmark,
   Copy,
   Check,
+  CheckCircle2,
+  MessageCircle,
 } from "lucide-react";
 
 export const Route = createFileRoute("/cart")({
