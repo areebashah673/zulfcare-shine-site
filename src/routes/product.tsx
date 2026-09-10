@@ -61,8 +61,8 @@ function ProductPage() {
         <div>
           <div className="overflow-hidden rounded-3xl shadow-xl">
             <img
-              src={gallery[active].src}
-              alt={gallery[active].alt}
+              src={gallery[active]!.src}
+              alt={gallery[active]!.alt}
               className="aspect-square h-full w-full object-cover"
             />
           </div>
