@@ -1,0 +1,199 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
+import { Minus, Plus, Trash2, Truck, ShieldCheck, ArrowLeft } from "lucide-react";
+
+export const Route = createFileRoute("/cart")({
+  head: () => ({
+    meta: [
+      { title: "Your Cart — Zulf Care Herbal Hair Oil" },
+      {
+        name: "description",
+        content:
+          "Review your Zulf Care herbal hair oil order — 100ml bottles of pure, mineral oil free hair oil with free delivery over Rs. 3000.",
+      },
+      { property: "og:title", content: "Your Cart — Zulf Care" },
+      {
+        property: "og:description",
+        content: "Review your Zulf Care herbal hair oil order and checkout.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
+  component: CartPage,
+});
+
+const initialItems = [
+  {
+    id: "oil-100",
+    name: "Herbal Hair Oil",
+    variant: "100 ml bottle",
+    price: 1450,
+    qty: 1,
+    image: "/images/bottle.webp",
+  },
+  {
+    id: "gift-box",
+    name: "Signature Kraft Gift Box",
+    variant: "Oil + wooden comb",
+    price: 2200,
+    qty: 1,
+    image: "/images/box.webp",
+  },
+];
+
+const rupees = (n: number) => `Rs. ${n.toLocaleString("en-PK")}`;
+
+function CartPage() {
+  const [items, setItems] = useState(initialItems);
+
+  const setQty = (id: string, delta: number) =>
+    setItems((prev) =>
+      prev.map((i) => (i.id === id ? { ...i, qty: Math.max(1, i.qty + delta) } : i)),
+    );
+
+  const remove = (id: string) => setItems((prev) => prev.filter((i) => i.id !== id));
+
+  const subtotal = useMemo(
+    () => items.reduce((sum, i) => sum + i.price * i.qty, 0),
+    [items],
+  );
+  const shipping = subtotal === 0 || subtotal >= 3000 ? 0 : 250;
+
+  return (
+    <div className="min-h-screen bg-background text-foreground">
+      <header className="border-b border-border/60 bg-background/80 backdrop-blur-md">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+          <Link to="/" className="font-serif text-2xl font-semibold tracking-wide text-primary">
+            Zulf <span className="italic">Care</span>
+          </Link>
+          <Link
+            to="/"
+            className="flex items-center gap-2 text-sm tracking-wide text-muted-foreground transition-colors hover:text-primary"
+          >
+            <ArrowLeft className="h-4 w-4" strokeWidth={1.5} />
+            Continue shopping
+          </Link>
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-6xl px-6 py-16">
+        <p className="mb-3 text-xs font-medium uppercase tracking-[0.35em] text-muted-foreground">
+          Your Selection
+        </p>
+        <h1 className="text-4xl font-medium text-primary md:text-5xl">
+          Shopping <span className="italic">Cart</span>
+        </h1>
+
+        {items.length === 0 ? (
+          <div className="mt-14 rounded-3xl border border-border bg-card p-16 text-center">
+            <p className="text-lg text-muted-foreground">Your cart is empty.</p>
+            <Link
+              to="/"
+              className="mt-8 inline-block rounded-full bg-primary px-8 py-3.5 text-sm font-medium tracking-wide text-primary-foreground transition-transform hover:-translate-y-0.5"
+            >
+              Browse the oil
+            </Link>
+          </div>
+        ) : (
+          <div className="mt-12 grid gap-10 lg:grid-cols-[1.6fr_1fr]">
+            <div className="space-y-5">
+              {items.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex flex-col gap-5 rounded-3xl border border-border bg-card p-5 sm:flex-row sm:items-center"
+                >
+                  <div className="h-32 w-32 shrink-0 overflow-hidden rounded-2xl">
+                    <img
+                      src={item.image}
+                      alt={`${item.name} — ${item.variant}`}
+                      className="h-full w-full object-cover"
+                      loading="lazy"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <h2 className="font-serif text-2xl font-semibold text-foreground">
+                      {item.name}
+                    </h2>
+                    <p className="mt-1 text-sm text-muted-foreground">{item.variant}</p>
+                    <p className="mt-3 text-lg text-primary">{rupees(item.price)}</p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-3 rounded-full border border-border px-3 py-2">
+                      <button
+                        aria-label="Decrease quantity"
+                        onClick={() => setQty(item.id, -1)}
+                        className="text-muted-foreground transition-colors hover:text-primary"
+                      >
+                        <Minus className="h-4 w-4" strokeWidth={1.5} />
+                      </button>
+                      <span className="w-5 text-center text-sm">{item.qty}</span>
+                      <button
+                        aria-label="Increase quantity"
+                        onClick={() => setQty(item.id, 1)}
+                        className="text-muted-foreground transition-colors hover:text-primary"
+                      >
+                        <Plus className="h-4 w-4" strokeWidth={1.5} />
+                      </button>
+                    </div>
+                    <button
+                      aria-label={`Remove ${item.name}`}
+                      onClick={() => remove(item.id)}
+                      className="text-muted-foreground transition-colors hover:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" strokeWidth={1.5} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <aside className="h-fit rounded-3xl bg-leaf p-8 text-leaf-foreground">
+              <h2 className="font-serif text-3xl font-semibold">Order Summary</h2>
+              <dl className="mt-8 space-y-4 text-sm">
+                <div className="flex justify-between opacity-80">
+                  <dt>Subtotal</dt>
+                  <dd>{rupees(subtotal)}</dd>
+                </div>
+                <div className="flex justify-between opacity-80">
+                  <dt>Delivery</dt>
+                  <dd>{shipping === 0 ? "Free" : rupees(shipping)}</dd>
+                </div>
+                <div className="mt-4 flex justify-between border-t border-leaf-foreground/20 pt-5 text-lg">
+                  <dt className="font-medium">Total</dt>
+                  <dd className="font-serif text-2xl text-gold">
+                    {rupees(subtotal + shipping)}
+                  </dd>
+                </div>
+              </dl>
+              <button className="mt-8 w-full rounded-full bg-gold px-8 py-3.5 text-sm font-medium tracking-wide text-leaf transition-transform hover:-translate-y-0.5">
+                Proceed to Checkout
+              </button>
+              <ul className="mt-8 space-y-3 text-sm opacity-75">
+                <li className="flex items-center gap-3">
+                  <Truck className="h-4 w-4 text-gold" strokeWidth={1.5} />
+                  Free delivery on orders over Rs. 3,000
+                </li>
+                <li className="flex items-center gap-3">
+                  <ShieldCheck className="h-4 w-4 text-gold" strokeWidth={1.5} />
+                  Cash on delivery available
+                </li>
+              </ul>
+            </aside>
+          </div>
+        )}
+      </main>
+
+      <footer className="bg-leaf px-6 py-14 text-leaf-foreground">
+        <div className="mx-auto flex max-w-6xl flex-col items-center gap-3 text-center">
+          <p className="font-serif text-3xl font-semibold">
+            Zulf <span className="italic">Care</span>
+          </p>
+          <p className="text-xs uppercase tracking-[0.35em] opacity-70">
+            Pure • Natural • Radiant
+          </p>
+        </div>
+      </footer>
+    </div>
+  );
+}
