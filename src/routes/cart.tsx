@@ -1,6 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Minus, Plus, Trash2, Truck, ShieldCheck, ArrowLeft } from "lucide-react";
+import {
+  Minus,
+  Plus,
+  Trash2,
+  Truck,
+  ShieldCheck,
+  ArrowLeft,
+  Banknote,
+  Landmark,
+  Copy,
+  Check,
+} from "lucide-react";
 
 export const Route = createFileRoute("/cart")({
   head: () => ({
@@ -44,8 +55,19 @@ const initialItems = [
 
 const rupees = (n: number) => `Rs. ${n.toLocaleString("en-PK")}`;
 
+const BANK_DETAILS = {
+  bank: "Habib Bank Limited (HBL)",
+  title: "Zulf Care",
+  account: "12345678901234",
+  iban: "PK36HABL0000123456789012",
+};
+
+type PaymentMethod = "cod" | "bank";
+
 function CartPage() {
   const [items, setItems] = useState(initialItems);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("cod");
+  const [copiedField, setCopiedField] = useState<string | null>(null);
 
   const setQty = (id: string, delta: number) =>
     setItems((prev) =>
@@ -59,6 +81,14 @@ function CartPage() {
     [items],
   );
   const shipping = subtotal === 0 || subtotal >= 3000 ? 0 : 250;
+  const bankDiscount = paymentMethod === "bank" ? Math.round(subtotal * 0.1) : 0;
+  const total = subtotal + shipping - bankDiscount;
+
+  const copyToClipboard = async (field: string, value: string) => {
+    await navigator.clipboard.writeText(value);
+    setCopiedField(field);
+    setTimeout(() => setCopiedField(null), 1500);
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -148,37 +178,154 @@ function CartPage() {
               ))}
             </div>
 
-            <aside className="h-fit rounded-3xl bg-leaf p-8 text-leaf-foreground">
-              <h2 className="font-serif text-3xl font-semibold">Order Summary</h2>
-              <dl className="mt-8 space-y-4 text-sm">
-                <div className="flex justify-between opacity-80">
-                  <dt>Subtotal</dt>
-                  <dd>{rupees(subtotal)}</dd>
+            <aside className="h-fit space-y-6">
+              <div className="rounded-3xl bg-leaf p-8 text-leaf-foreground">
+                <h2 className="font-serif text-3xl font-semibold">Order Summary</h2>
+                <dl className="mt-8 space-y-4 text-sm">
+                  <div className="flex justify-between opacity-80">
+                    <dt>Subtotal</dt>
+                    <dd>{rupees(subtotal)}</dd>
+                  </div>
+                  <div className="flex justify-between opacity-80">
+                    <dt>Delivery</dt>
+                    <dd>{shipping === 0 ? "Free" : rupees(shipping)}</dd>
+                  </div>
+                  {bankDiscount > 0 && (
+                    <div className="flex justify-between text-gold">
+                      <dt>Bank transfer discount (10%)</dt>
+                      <dd>-{rupees(bankDiscount)}</dd>
+                    </div>
+                  )}
+                  <div className="mt-4 flex justify-between border-t border-leaf-foreground/20 pt-5 text-lg">
+                    <dt className="font-medium">Total</dt>
+                    <dd className="font-serif text-2xl text-gold">
+                      {rupees(total)}
+                    </dd>
+                  </div>
+                </dl>
+
+                <div className="mt-8 space-y-3">
+                  <p className="text-xs font-medium uppercase tracking-[0.25em] opacity-70">
+                    Choose payment method
+                  </p>
+
+                  <button
+                    onClick={() => setPaymentMethod("cod")}
+                    className={`flex w-full items-center gap-4 rounded-2xl border px-4 py-3.5 text-left transition-colors ${
+                      paymentMethod === "cod"
+                        ? "border-gold bg-gold/10"
+                        : "border-leaf-foreground/20 bg-leaf-foreground/5 hover:bg-leaf-foreground/10"
+                    }`}
+                  >
+                    <div
+                      className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${
+                        paymentMethod === "cod" ? "bg-gold text-leaf" : "bg-leaf-foreground/10"
+                      }`}
+                    >
+                      <Banknote className="h-5 w-5" strokeWidth={1.5} />
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium">Cash on Delivery</p>
+                      <p className="text-xs opacity-70">Pay when your order arrives</p>
+                    </div>
+                    <div
+                      className={`h-5 w-5 rounded-full border-2 ${
+                        paymentMethod === "cod"
+                          ? "border-gold bg-gold"
+                          : "border-leaf-foreground/40"
+                      }`}
+                    >
+                      {paymentMethod === "cod" && (
+                        <Check className="h-3.5 w-3.5 text-leaf" strokeWidth={3} />
+                      )}
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={() => setPaymentMethod("bank")}
+                    className={`flex w-full items-center gap-4 rounded-2xl border px-4 py-3.5 text-left transition-colors ${
+                      paymentMethod === "bank"
+                        ? "border-gold bg-gold/10"
+                        : "border-leaf-foreground/20 bg-leaf-foreground/5 hover:bg-leaf-foreground/10"
+                    }`}
+                  >
+                    <div
+                      className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${
+                        paymentMethod === "bank" ? "bg-gold text-leaf" : "bg-leaf-foreground/10"
+                      }`}
+                    >
+                      <Landmark className="h-5 w-5" strokeWidth={1.5} />
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium">Bank Transfer</p>
+                      <p className="text-xs opacity-70">Get 10% off — pay via bank deposit</p>
+                    </div>
+                    <div
+                      className={`h-5 w-5 rounded-full border-2 ${
+                        paymentMethod === "bank"
+                          ? "border-gold bg-gold"
+                          : "border-leaf-foreground/40"
+                      }`}
+                    >
+                      {paymentMethod === "bank" && (
+                        <Check className="h-3.5 w-3.5 text-leaf" strokeWidth={3} />
+                      )}
+                    </div>
+                  </button>
                 </div>
-                <div className="flex justify-between opacity-80">
-                  <dt>Delivery</dt>
-                  <dd>{shipping === 0 ? "Free" : rupees(shipping)}</dd>
-                </div>
-                <div className="mt-4 flex justify-between border-t border-leaf-foreground/20 pt-5 text-lg">
-                  <dt className="font-medium">Total</dt>
-                  <dd className="font-serif text-2xl text-gold">
-                    {rupees(subtotal + shipping)}
-                  </dd>
-                </div>
-              </dl>
-              <button className="mt-8 w-full rounded-full bg-gold px-8 py-3.5 text-sm font-medium tracking-wide text-leaf transition-transform hover:-translate-y-0.5">
-                Proceed to Checkout
-              </button>
-              <ul className="mt-8 space-y-3 text-sm opacity-75">
-                <li className="flex items-center gap-3">
-                  <Truck className="h-4 w-4 text-gold" strokeWidth={1.5} />
-                  Free delivery on orders over Rs. 3,000
-                </li>
-                <li className="flex items-center gap-3">
-                  <ShieldCheck className="h-4 w-4 text-gold" strokeWidth={1.5} />
-                  Cash on delivery available
-                </li>
-              </ul>
+
+                {paymentMethod === "bank" && (
+                  <div className="mt-6 rounded-2xl border border-gold/30 bg-gold/10 p-5">
+                    <p className="mb-4 text-sm font-medium text-gold">
+                      Transfer the total to this account and share the receipt on WhatsApp:
+                    </p>
+                    <dl className="space-y-3 text-sm">
+                      {[
+                        { label: "Bank", value: BANK_DETAILS.bank, key: "bank" },
+                        { label: "Account Title", value: BANK_DETAILS.title, key: "title" },
+                        { label: "Account Number", value: BANK_DETAILS.account, key: "account" },
+                        { label: "IBAN", value: BANK_DETAILS.iban, key: "iban" },
+                      ].map(({ label, value, key }) => (
+                        <div
+                          key={key}
+                          className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between"
+                        >
+                          <dt className="opacity-70">{label}</dt>
+                          <dd className="flex items-center gap-2 font-medium">
+                            <span className="break-all">{value}</span>
+                            <button
+                              onClick={() => copyToClipboard(key, value)}
+                              aria-label={`Copy ${label}`}
+                              className="shrink-0 text-gold transition-opacity hover:opacity-70"
+                            >
+                              {copiedField === key ? (
+                                <Check className="h-4 w-4" strokeWidth={2} />
+                              ) : (
+                                <Copy className="h-4 w-4" strokeWidth={1.5} />
+                              )}
+                            </button>
+                          </dd>
+                        </div>
+                      ))}
+                    </dl>
+                  </div>
+                )}
+
+                <button className="mt-8 w-full rounded-full bg-gold px-8 py-3.5 text-sm font-medium tracking-wide text-leaf transition-transform hover:-translate-y-0.5">
+                  {paymentMethod === "bank" ? "I’ve Paid via Bank Transfer" : "Place Order (COD)"}
+                </button>
+
+                <ul className="mt-8 space-y-3 text-sm opacity-75">
+                  <li className="flex items-center gap-3">
+                    <Truck className="h-4 w-4 text-gold" strokeWidth={1.5} />
+                    Free delivery on orders over Rs. 3,000
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <ShieldCheck className="h-4 w-4 text-gold" strokeWidth={1.5} />
+                    Cash on delivery available
+                  </li>
+                </ul>
+              </div>
             </aside>
           </div>
         )}
