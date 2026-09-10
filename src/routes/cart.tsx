@@ -67,10 +67,37 @@ const BANK_DETAILS = {
 
 type PaymentMethod = "cod" | "bank";
 
+const detailsSchema = z.object({
+  name: z.string().trim().min(2, "Please enter your full name").max(100),
+  email: z.string().trim().email("Enter a valid email address").max(255),
+  address: z.string().trim().min(8, "Please enter your full address").max(300),
+  zip: z
+    .string()
+    .trim()
+    .regex(/^\d{4,10}$/, "Enter a valid zip / postal code"),
+  whatsapp: z
+    .string()
+    .trim()
+    .regex(/^[+0-9][0-9\s-]{8,17}$/, "Enter a valid WhatsApp number"),
+});
+
+type Details = z.infer<typeof detailsSchema>;
+
+const emptyDetails: Details = {
+  name: "",
+  email: "",
+  address: "",
+  zip: "",
+  whatsapp: "",
+};
+
 function CartPage() {
   const [items, setItems] = useState(initialItems);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("cod");
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [details, setDetails] = useState<Details>(emptyDetails);
+  const [errors, setErrors] = useState<Partial<Record<keyof Details, string>>>({});
+  const [placed, setPlaced] = useState(false);
 
   const setQty = (id: string, delta: number) =>
     setItems((prev) =>
