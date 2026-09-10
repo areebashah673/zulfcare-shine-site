@@ -83,6 +83,7 @@ function Index() {
             <a href="#benefits" className="transition-colors hover:text-primary">Benefits</a>
             <a href="#ritual" className="transition-colors hover:text-primary">The Ritual</a>
             <a href="#ingredients" className="transition-colors hover:text-primary">Ingredients</a>
+            <Link to="/shop" className="transition-colors hover:text-primary">Shop</Link>
             <Link
               to="/cart"
               className="flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-primary-foreground transition-colors hover:bg-primary/90"
@@ -108,12 +109,12 @@ function Index() {
             traditional way — the ritual your grandmother swore by.
           </p>
           <div className="mt-10 flex flex-wrap items-center gap-4">
-            <a
-              href="#shop"
+            <Link
+              to="/shop"
               className="rounded-full bg-primary px-8 py-3.5 text-sm font-medium tracking-wide text-primary-foreground transition-transform hover:-translate-y-0.5"
             >
               Shop Herbal Hair Oil
-            </a>
+            </Link>
             <a
               href="#benefits"
               className="text-sm font-medium tracking-wide text-primary underline-offset-4 hover:underline"
@@ -244,10 +245,10 @@ function Index() {
               Made with love, in small batches
             </div>
             <Link
-              to="/cart"
+              to="/product"
               className="mt-10 inline-block rounded-full bg-primary px-8 py-3.5 text-sm font-medium tracking-wide text-primary-foreground transition-transform hover:-translate-y-0.5"
             >
-              Add to Cart
+              View Product
             </Link>
           </div>
           <div className="order-1 overflow-hidden rounded-3xl shadow-xl md:order-2">
