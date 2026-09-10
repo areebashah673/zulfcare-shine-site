@@ -293,7 +293,91 @@ function CartPage() {
                   </div>
                 </div>
               ))}
+
+              <div
+                id="delivery-details"
+                className="rounded-3xl border border-border bg-card p-8"
+              >
+                <h2 className="font-serif text-2xl font-semibold text-primary">
+                  Delivery Details
+                </h2>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Our agent will confirm your order on WhatsApp.
+                </p>
+
+                <div className="mt-7 grid gap-5 sm:grid-cols-2">
+                  {(
+                    [
+                      { key: "name", label: "Full name", placeholder: "Areeba Shah", type: "text" },
+                      {
+                        key: "email",
+                        label: "Email address",
+                        placeholder: "you@example.com",
+                        type: "email",
+                      },
+                      {
+                        key: "whatsapp",
+                        label: "WhatsApp number",
+                        placeholder: "+92 300 1234567",
+                        type: "tel",
+                      },
+                      { key: "zip", label: "Zip / Postal code", placeholder: "75500", type: "text" },
+                    ] as const
+                  ).map((field) => (
+                    <div key={field.key}>
+                      <label
+                        htmlFor={field.key}
+                        className="mb-2 block text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground"
+                      >
+                        {field.label}
+                      </label>
+                      <input
+                        id={field.key}
+                        type={field.type}
+                        value={details[field.key]}
+                        placeholder={field.placeholder}
+                        maxLength={255}
+                        onChange={(e) =>
+                          setDetails((prev) => ({ ...prev, [field.key]: e.target.value }))
+                        }
+                        className={`w-full rounded-2xl border bg-background px-4 py-3 text-sm outline-none transition-colors focus:border-primary ${
+                          errors[field.key] ? "border-destructive" : "border-border"
+                        }`}
+                      />
+                      {errors[field.key] && (
+                        <p className="mt-2 text-xs text-destructive">{errors[field.key]}</p>
+                      )}
+                    </div>
+                  ))}
+
+                  <div className="sm:col-span-2">
+                    <label
+                      htmlFor="address"
+                      className="mb-2 block text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground"
+                    >
+                      Delivery address
+                    </label>
+                    <textarea
+                      id="address"
+                      rows={3}
+                      maxLength={300}
+                      value={details.address}
+                      placeholder="House / street, area, city"
+                      onChange={(e) =>
+                        setDetails((prev) => ({ ...prev, address: e.target.value }))
+                      }
+                      className={`w-full resize-none rounded-2xl border bg-background px-4 py-3 text-sm outline-none transition-colors focus:border-primary ${
+                        errors.address ? "border-destructive" : "border-border"
+                      }`}
+                    />
+                    {errors.address && (
+                      <p className="mt-2 text-xs text-destructive">{errors.address}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
+
 
             <aside className="h-fit space-y-6">
               <div className="rounded-3xl bg-leaf p-8 text-leaf-foreground">
