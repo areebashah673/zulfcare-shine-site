@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { z } from "zod";
 import {
   Minus,
   Plus,
@@ -11,6 +12,8 @@ import {
   Landmark,
   Copy,
   Check,
+  CheckCircle2,
+  MessageCircle,
 } from "lucide-react";
 
 export const Route = createFileRoute("/cart")({
@@ -64,10 +67,37 @@ const BANK_DETAILS = {
 
 type PaymentMethod = "cod" | "bank";
 
+const detailsSchema = z.object({
+  name: z.string().trim().min(2, "Please enter your full name").max(100),
+  email: z.string().trim().email("Enter a valid email address").max(255),
+  address: z.string().trim().min(8, "Please enter your full address").max(300),
+  zip: z
+    .string()
+    .trim()
+    .regex(/^\d{4,10}$/, "Enter a valid zip / postal code"),
+  whatsapp: z
+    .string()
+    .trim()
+    .regex(/^[+0-9][0-9\s-]{8,17}$/, "Enter a valid WhatsApp number"),
+});
+
+type Details = z.infer<typeof detailsSchema>;
+
+const emptyDetails: Details = {
+  name: "",
+  email: "",
+  address: "",
+  zip: "",
+  whatsapp: "",
+};
+
 function CartPage() {
   const [items, setItems] = useState(initialItems);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("cod");
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [details, setDetails] = useState<Details>(emptyDetails);
+  const [errors, setErrors] = useState<Partial<Record<keyof Details, string>>>({});
+  const [placed, setPlaced] = useState(false);
 
   const setQty = (id: string, delta: number) =>
     setItems((prev) =>
@@ -89,6 +119,93 @@ function CartPage() {
     setCopiedField(field);
     setTimeout(() => setCopiedField(null), 1500);
   };
+
+  const handleCheckout = () => {
+    const result = detailsSchema.safeParse(details);
+    if (!result.success) {
+      const next: Partial<Record<keyof Details, string>> = {};
+      for (const issue of result.error.issues) {
+        const key = issue.path[0] as keyof Details;
+        if (!next[key]) next[key] = issue.message;
+      }
+      setErrors(next);
+      document
+        .getElementById("delivery-details")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+    setErrors({});
+    setPlaced(true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  if (placed) {
+    return (
+      <div className="flex min-h-screen flex-col bg-background text-foreground">
+        <header className="border-b border-border/60 bg-background/80 backdrop-blur-md">
+          <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+            <Link to="/" className="font-serif text-2xl font-semibold tracking-wide text-primary">
+              Zulf <span className="italic">Care</span>
+            </Link>
+          </div>
+        </header>
+
+        <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col items-center px-6 py-24 text-center">
+          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-leaf text-gold">
+            <CheckCircle2 className="h-10 w-10" strokeWidth={1.5} />
+          </div>
+          <h1 className="mt-8 font-serif text-4xl font-semibold text-primary md:text-5xl">
+            Your order has been <span className="italic">placed</span>
+          </h1>
+          <p className="mt-5 text-lg text-muted-foreground">
+            Thank you, {details.name.split(" ")[0]}. Our agent will contact you shortly on your
+            WhatsApp number to confirm the delivery.
+          </p>
+
+          <div className="mt-10 w-full rounded-3xl border border-border bg-card p-8 text-left">
+            <dl className="space-y-4 text-sm">
+              <div className="flex items-center justify-between gap-4">
+                <dt className="text-muted-foreground">WhatsApp</dt>
+                <dd className="flex items-center gap-2 font-medium">
+                  <MessageCircle className="h-4 w-4 text-primary" strokeWidth={1.5} />
+                  {details.whatsapp}
+                </dd>
+              </div>
+              <div className="flex items-center justify-between gap-4">
+                <dt className="text-muted-foreground">Payment</dt>
+                <dd className="font-medium">
+                  {paymentMethod === "bank" ? "Bank Transfer (10% off)" : "Cash on Delivery"}
+                </dd>
+              </div>
+              <div className="flex items-center justify-between gap-4">
+                <dt className="text-muted-foreground">Delivering to</dt>
+                <dd className="max-w-[60%] text-right font-medium">
+                  {details.address}, {details.zip}
+                </dd>
+              </div>
+              <div className="flex items-center justify-between gap-4 border-t border-border pt-4">
+                <dt className="text-muted-foreground">Total</dt>
+                <dd className="font-serif text-2xl text-primary">{rupees(total)}</dd>
+              </div>
+            </dl>
+            {paymentMethod === "bank" && (
+              <p className="mt-6 rounded-2xl bg-muted p-4 text-xs text-muted-foreground">
+                Please share your transfer receipt with our agent on WhatsApp so we can dispatch
+                your order.
+              </p>
+            )}
+          </div>
+
+          <Link
+            to="/"
+            className="mt-10 inline-block rounded-full bg-primary px-8 py-3.5 text-sm font-medium tracking-wide text-primary-foreground transition-transform hover:-translate-y-0.5"
+          >
+            Back to home
+          </Link>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -176,7 +293,91 @@ function CartPage() {
                   </div>
                 </div>
               ))}
+
+              <div
+                id="delivery-details"
+                className="rounded-3xl border border-border bg-card p-8"
+              >
+                <h2 className="font-serif text-2xl font-semibold text-primary">
+                  Delivery Details
+                </h2>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Our agent will confirm your order on WhatsApp.
+                </p>
+
+                <div className="mt-7 grid gap-5 sm:grid-cols-2">
+                  {(
+                    [
+                      { key: "name", label: "Full name", placeholder: "Areeba Shah", type: "text" },
+                      {
+                        key: "email",
+                        label: "Email address",
+                        placeholder: "you@example.com",
+                        type: "email",
+                      },
+                      {
+                        key: "whatsapp",
+                        label: "WhatsApp number",
+                        placeholder: "+92 300 1234567",
+                        type: "tel",
+                      },
+                      { key: "zip", label: "Zip / Postal code", placeholder: "75500", type: "text" },
+                    ] as const
+                  ).map((field) => (
+                    <div key={field.key}>
+                      <label
+                        htmlFor={field.key}
+                        className="mb-2 block text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground"
+                      >
+                        {field.label}
+                      </label>
+                      <input
+                        id={field.key}
+                        type={field.type}
+                        value={details[field.key]}
+                        placeholder={field.placeholder}
+                        maxLength={255}
+                        onChange={(e) =>
+                          setDetails((prev) => ({ ...prev, [field.key]: e.target.value }))
+                        }
+                        className={`w-full rounded-2xl border bg-background px-4 py-3 text-sm outline-none transition-colors focus:border-primary ${
+                          errors[field.key] ? "border-destructive" : "border-border"
+                        }`}
+                      />
+                      {errors[field.key] && (
+                        <p className="mt-2 text-xs text-destructive">{errors[field.key]}</p>
+                      )}
+                    </div>
+                  ))}
+
+                  <div className="sm:col-span-2">
+                    <label
+                      htmlFor="address"
+                      className="mb-2 block text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground"
+                    >
+                      Delivery address
+                    </label>
+                    <textarea
+                      id="address"
+                      rows={3}
+                      maxLength={300}
+                      value={details.address}
+                      placeholder="House / street, area, city"
+                      onChange={(e) =>
+                        setDetails((prev) => ({ ...prev, address: e.target.value }))
+                      }
+                      className={`w-full resize-none rounded-2xl border bg-background px-4 py-3 text-sm outline-none transition-colors focus:border-primary ${
+                        errors.address ? "border-destructive" : "border-border"
+                      }`}
+                    />
+                    {errors.address && (
+                      <p className="mt-2 text-xs text-destructive">{errors.address}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
+
 
             <aside className="h-fit space-y-6">
               <div className="rounded-3xl bg-leaf p-8 text-leaf-foreground">
