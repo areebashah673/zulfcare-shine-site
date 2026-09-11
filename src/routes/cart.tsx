@@ -38,25 +38,6 @@ export const Route = createFileRoute("/cart")({
   component: CartPage,
 });
 
-const initialItems = [
-  {
-    id: "oil-100",
-    name: "Herbal Hair Oil",
-    variant: "100 ml bottle",
-    price: 1450,
-    qty: 1,
-    image: "/images/bottle.webp",
-  },
-  {
-    id: "gift-box",
-    name: "Signature Kraft Gift Box",
-    variant: "Oil + wooden comb",
-    price: 2200,
-    qty: 1,
-    image: "/images/box.webp",
-  },
-];
-
 const rupees = (n: number) => `Rs. ${n.toLocaleString("en-PK")}`;
 
 const BANK_DETAILS = {
@@ -93,12 +74,20 @@ const emptyDetails: Details = {
 };
 
 function CartPage() {
-  const [items, setItems] = useState(initialItems);
+  const [items, setItemsState] = useState<CartItem[]>(() => getCart());
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("cod");
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [details, setDetails] = useState<Details>(emptyDetails);
   const [errors, setErrors] = useState<Partial<Record<keyof Details, string>>>({});
   const [placed, setPlaced] = useState(false);
+
+  const setItems = (updater: (prev: CartItem[]) => CartItem[]) => {
+    setItemsState((prev) => {
+      const next = updater(prev);
+      saveCart(next);
+      return next;
+    });
+  };
 
   const setQty = (id: string, delta: number) =>
     setItems((prev) =>
