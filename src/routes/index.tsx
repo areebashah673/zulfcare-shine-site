@@ -102,8 +102,11 @@ function Index() {
             Pure • Natural • Radiant
           </p>
           <h1 className="text-5xl font-medium leading-[1.05] text-primary md:text-7xl">
-            Because your hair deserves <span className="italic">real care</span>
+            Zulf Care <span className="italic">Herbal Hair Oil</span>
           </h1>
+          <p className="mt-4 font-serif text-2xl italic text-primary/80">
+            Because your hair deserves real care
+          </p>
           <p className="mt-6 max-w-md text-lg leading-relaxed text-muted-foreground">
             A powerful blend of 15+ herbal ingredients, handpicked and bottled the
             traditional way — the ritual your grandmother swore by.
