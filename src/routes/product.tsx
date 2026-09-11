@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Leaf, Minus, Plus, ShieldCheck, Sparkles, Truck } from "lucide-react";
 import { useState } from "react";
+import { addToCart } from "@/lib/cart";
 
 export const Route = createFileRoute("/product")({
   head: () => ({
