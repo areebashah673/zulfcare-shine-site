@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { z } from "zod";
+import { clearCart, getCart, saveCart, type CartItem } from "@/lib/cart";
 import {
   Minus,
   Plus,
@@ -36,25 +37,6 @@ export const Route = createFileRoute("/cart")({
   }),
   component: CartPage,
 });
-
-const initialItems = [
-  {
-    id: "oil-100",
-    name: "Herbal Hair Oil",
-    variant: "100 ml bottle",
-    price: 1450,
-    qty: 1,
-    image: "/images/bottle.webp",
-  },
-  {
-    id: "gift-box",
-    name: "Signature Kraft Gift Box",
-    variant: "Oil + wooden comb",
-    price: 2200,
-    qty: 1,
-    image: "/images/box.webp",
-  },
-];
 
 const rupees = (n: number) => `Rs. ${n.toLocaleString("en-PK")}`;
 
@@ -92,12 +74,20 @@ const emptyDetails: Details = {
 };
 
 function CartPage() {
-  const [items, setItems] = useState(initialItems);
+  const [items, setItemsState] = useState<CartItem[]>(() => getCart());
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("cod");
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [details, setDetails] = useState<Details>(emptyDetails);
   const [errors, setErrors] = useState<Partial<Record<keyof Details, string>>>({});
   const [placed, setPlaced] = useState(false);
+
+  const setItems = (updater: (prev: CartItem[]) => CartItem[]) => {
+    setItemsState((prev) => {
+      const next = updater(prev);
+      saveCart(next);
+      return next;
+    });
+  };
 
   const setQty = (id: string, delta: number) =>
     setItems((prev) =>
@@ -135,6 +125,7 @@ function CartPage() {
       return;
     }
     setErrors({});
+    clearCart();
     setPlaced(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -512,7 +503,10 @@ function CartPage() {
                   </div>
                 )}
 
-                <button className="mt-8 w-full rounded-full bg-gold px-8 py-3.5 text-sm font-medium tracking-wide text-leaf transition-transform hover:-translate-y-0.5">
+                <button
+                  onClick={handleCheckout}
+                  className="mt-8 w-full rounded-full bg-gold px-8 py-3.5 text-sm font-medium tracking-wide text-leaf transition-transform hover:-translate-y-0.5"
+                >
                   {paymentMethod === "bank" ? "I’ve Paid via Bank Transfer" : "Place Order (COD)"}
                 </button>
 

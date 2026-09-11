@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Leaf, Minus, Plus, ShieldCheck, Sparkles, Truck } from "lucide-react";
 import { useState } from "react";
+import { addToCart } from "@/lib/cart";
 
 export const Route = createFileRoute("/product")({
   head: () => ({
@@ -136,7 +137,19 @@ function ProductPage() {
               </button>
             </div>
             <button
-              onClick={() => navigate({ to: "/cart" })}
+              onClick={() => {
+                addToCart(
+                  {
+                    id: "oil-100",
+                    name: "Herbal Hair Oil",
+                    variant: "100 ml bottle",
+                    price: 1499,
+                    image: "/images/bottle.webp",
+                  },
+                  qty,
+                );
+                navigate({ to: "/cart" });
+              }}
               className="flex-1 rounded-full bg-primary px-8 py-3.5 text-sm font-medium tracking-wide text-primary-foreground transition-transform hover:-translate-y-0.5"
             >
               Add to Cart — Rs. {(1499 * qty).toLocaleString()}
