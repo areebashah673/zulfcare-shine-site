@@ -77,14 +77,22 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "Zulf Care — Herbal Hair Oil" },
+      {
+        name: "description",
+        content:
+          "Zulf Care makes pure, natural herbal hair oil — a blend of 15+ ingredients for hair fall protection, volume and shine.",
+      },
+      { name: "author", content: "Zulf Care" },
+      { property: "og:title", content: "Zulf Care — Herbal Hair Oil" },
+      {
+        property: "og:description",
+        content:
+          "Pure, natural herbal hair care. A blend of 15+ ingredients for stronger, shinier hair.",
+      },
+      { property: "og:site_name", content: "Zulf Care" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
       {

@@ -15,10 +15,38 @@ export const Route = createFileRoute("/product")({
       { property: "og:title", content: "Herbal Hair Oil 100 ml — Zulf Care" },
       {
         property: "og:description",
-        content: "A powerful blend of 15+ herbal ingredients. Because your hair deserves real care.",
+        content:
+          "The 100 ml Zulf Care bottle: 15+ herbal ingredients, mineral oil and paraben free, Rs. 1,499 with delivery across Pakistan.",
       },
       { property: "og:type", content: "product" },
+      { property: "og:url", content: "https://zulfcare-shine-site.lovable.app/product" },
       { name: "twitter:card", content: "summary" },
+    ],
+    links: [{ rel: "canonical", href: "https://zulfcare-shine-site.lovable.app/product" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Product",
+          name: "Zulf Care Herbal Hair Oil 100 ml",
+          description:
+            "Zulf Care herbal hair oil, 100 ml — a powerful blend of 15+ herbal ingredients for hair fall protection, volume and shine. Mineral oil and paraben free.",
+          image: [
+            "https://zulfcare-shine-site.lovable.app/images/bottle.webp",
+            "https://zulfcare-shine-site.lovable.app/images/box.webp",
+            "https://zulfcare-shine-site.lovable.app/images/zulfcare.webp",
+          ],
+          brand: { "@type": "Brand", name: "Zulf Care" },
+          offers: {
+            "@type": "Offer",
+            price: 1499,
+            priceCurrency: "PKR",
+            availability: "https://schema.org/InStock",
+            url: "https://zulfcare-shine-site.lovable.app/product",
+          },
+        }),
+      },
     ],
   }),
   component: ProductPage,

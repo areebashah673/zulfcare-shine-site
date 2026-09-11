@@ -44,8 +44,11 @@ function ShopPage() {
           The Collection
         </p>
         <h1 className="text-4xl font-medium text-primary md:text-5xl">
-          One oil. <span className="italic">Everything your hair needs.</span>
+          Shop Zulf Care <span className="italic">Herbal Hair Oil</span>
         </h1>
+        <p className="mt-4 text-muted-foreground">
+          One oil. Everything your hair needs.
+        </p>
 
         <div className="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           <Link
