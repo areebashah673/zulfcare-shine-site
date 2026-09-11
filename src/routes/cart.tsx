@@ -125,6 +125,7 @@ function CartPage() {
       return;
     }
     setErrors({});
+    clearCart();
     setPlaced(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -502,7 +503,10 @@ function CartPage() {
                   </div>
                 )}
 
-                <button className="mt-8 w-full rounded-full bg-gold px-8 py-3.5 text-sm font-medium tracking-wide text-leaf transition-transform hover:-translate-y-0.5">
+                <button
+                  onClick={handleCheckout}
+                  className="mt-8 w-full rounded-full bg-gold px-8 py-3.5 text-sm font-medium tracking-wide text-leaf transition-transform hover:-translate-y-0.5"
+                >
                   {paymentMethod === "bank" ? "I’ve Paid via Bank Transfer" : "Place Order (COD)"}
                 </button>
 
