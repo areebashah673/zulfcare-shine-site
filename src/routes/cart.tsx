@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { z } from "zod";
+import { clearCart, getCart, saveCart, type CartItem } from "@/lib/cart";
 import {
   Minus,
   Plus,
